@@ -1,0 +1,126 @@
+SQL> 
+SQL> SELECT SUM(bytes)
+  2  FROM user_segments 
+  3  WHERE segment_name = 'LINEITEM';
+  
+Total Storage In Bytes
+----------------------
+             266855324
+
+1 row selected.
+
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> create tablespace tp2
+  2  extent management local uniform size 64K
+  3  SEGMENT SPACE MANAGEMENT MANUAL 
+  4          datafile 'l1.dbf' size 30m autoextend off, 
+  5          'l2.dbf' size 30m autoextend off,
+  6          'l3.dbf' size 30m autoextend off,
+  7          'l4.dbf' size 30m autoextend off,
+  8          'l5.dbf' size 30m autoextend off,
+  9          'l6.dbf' size 30m autoextend off,
+ 10          'l7.dbf' size 30m autoextend off,
+ 11          'l8.dbf' size 30m autoextend off,
+ 12          'l9.dbf' size 30m autoextend off,
+ 13          'l10.dbf' size 30m autoextend off;
+
+Tablespace TP2 created.
+
+SQL> 
+SQL> ALTER USER CSCI317 QUOTA 500M ON tp2;
+
+User CSCI317 altered.
+
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> 
+SQL> CREATE TABLE LINEITEM_NEW(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEMNEW_PKEY PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19  	CONSTRAINT LINEITEMNEW_FKEY1 FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEMNEW_FKEY2 FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEMNEW_FKEY3 FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP(PS_PARTKEY, PS_SUPPKEY),
+ 25  	CONSTRAINT LINEITEMNEW_FKEY4 FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEMNEW_CHECK1 CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEMNEW_CHECK2 CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEMNEW_CHECK3 CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEMNEW_CHECK4 CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      PCTFREE 0
+ 32      TABLESPACE tp2;
+
+Table LINEITEM_NEW created.
+
+SQL> 
+SQL> INSERT INTO LINEITEM_NEW
+  2  SELECT * FROM LINEITEM;
+
+1,800,093 rows inserted.
+
+SQL> 
+SQL> create table TS(
+  2  ts timestamp);
+
+Table TIMESTAMPS created.
+
+SQL> 
+SQL> insert into TS values(systimestamp);
+
+1 row inserted.
+
+SQL> 
+SQL> set termout off
+SQL> set feedback off
+SQL> 
+SQL> select * from lineitem;
+SQL> select * from lineitem;
+SQL> select * from lineitem;
+SQL> select * from LINEITEM_NEW;
+SQL> select * from LINEITEM_NEW;
+SQL> select * from LINEITEM_NEW;
+SQL> 
+SQL> set feedback on
+SQL> insert into TS values(systimestamp);
+
+1 row inserted.
+
+SQL> set termout on
+SQL> select max(ts)-min(ts) as "total time" from TS;
+
+total time         
+-------------------
++00 00:00:47.842473
+
+1 row selected. 
+
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> drop tablespace tp2 including contents and datafiles;
+
+Tablespace TP2 dropped.
+
+SQL> 
+SQL> spool off

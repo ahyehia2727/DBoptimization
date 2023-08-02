@@ -1,0 +1,50 @@
+SQL> set echo on
+SQL> set feedback on
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> SELECT dba_data_files.tablespace_name,dba_data_files.file_name FROM dba_data_files where dba_data_files.tablespace_name='TPCHR';
+
+TABLESPACE_NAME                FILE_NAME                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+------------------------------ ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+TPCHR                          /u01/app/oracle/product/version/db_1/dbs/tpchr.dbf                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+1 row selected. 
+
+SQL> 
+SQL> select table_name,tablespace_name,num_rows from user_tables;
+
+TABLE NAME                     TABLESPACE_NAME                  NUM_ROWS
+------------------------------ ------------------------------ ----------
+REGION                         TPCHR                                   5
+NATION                         TPCHR                                  25
+PART                           TPCHR                               60000
+SUPPLIER                       TPCHR                                3000
+PARTSUPP                       TPCHR                              240000
+CUSTOMER                       TPCHR                               45000
+ORDERSS                        TPCHR                              450000
+LINEITEM                       TPCHR                             1800093
+
+8 rows selected. 
+
+SQL> 
+SQL> select table_name,owner,tablespace_name,num_rows,blocks from all_tables join dba_users on dba_users.username=all_tables.owner and dba_users.created>TO_DATE('20-02-2023','dd-mm-yyyy');
+
+TABLE NAME                     OWNER                                                                                                                            TABLESPACE_NAME                  NUM_ROWS     BLOCKS
+------------------------------ -------------------------------------------------------------------------------------------------------------------------------- ------------------------------ ---------- ----------
+REGION                         CSCI317                                                                                                                          TPCHR                                   5         28
+NATION                         CSCI317                                                                                                                          TPCHR                                  25         28
+PART                           CSCI317                                                                                                                          TPCHR                               60000       1064
+SUPPLIER                       CSCI317                                                                                                                          TPCHR                                3000         88
+PARTSUPP                       CSCI317                                                                                                                          TPCHR                              240000       4939
+CUSTOMER                       CSCI317                                                                                                                          TPCHR                               45000       1033
+ORDERSS                        CSCI317                                                                                                                          TPCHR                              450000       7175
+LINEITEM                       CSCI317                                                                                                                          TPCHR                             1800093      32344
+
+8 rows selected. 
+
+SQL> PROMPT
+
+SQL> 
+SQL> 
+SQL> spool off

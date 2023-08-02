@@ -1,0 +1,317 @@
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> set autotrace traceonly statistics on
+Autotrace TraceOnly
+ Exhibits the performance statistics with silent query output
+SP2-0158: unknown SET option "on"
+SQL> 
+SQL> select distinct s.s_name,s.s_address from supplier s 
+  2  join lineitem l on l.l_suppkey=s.s_suppkey 
+  3  join orderss o on o.o_orderkey=l.l_orderkey
+  4  and extract(year from o_orderdate)=1991;
+
+0 rows selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  b16599unrpsad, child number 0
+-------------------------------------
+select distinct s.s_name,s.s_address from supplier s  join lineitem l 
+on l.l_suppkey=s.s_suppkey  join orderss o on o.o_orderkey=l.l_orderkey 
+and extract(year from o_orderdate)=1991
+ 
+Plan hash value: 3793200698
+ 
+--------------------------------------------------------------------------------------------
+| Id  | Operation                      | Name          | E-Rows |  OMem |  1Mem | Used-Mem |
+--------------------------------------------------------------------------------------------
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT               |               |        |       |       |          |
+|   1 |  HASH UNIQUE                   |               |  17762 |  2959K|  1155K|          |
+|*  2 |   HASH JOIN                    |               |  17762 |  1099K|  1099K|  753K (0)|
+|   3 |    TABLE ACCESS FULL           | SUPPLIER      |   3000 |       |       |          |
+|   4 |    NESTED LOOPS                |               |  17762 |       |       |          |
+|   5 |     NESTED LOOPS               |               |        |       |       |          |
+|*  6 |      TABLE ACCESS FULL         | ORDERSS       |   4500 |       |       |          |
+|*  7 |      INDEX RANGE SCAN          | LINEITEM_PKEY |        |       |       |          |
+|*  8 |     TABLE ACCESS BY INDEX ROWID| LINEITEM      |      4 |       |       |          |
+--------------------------------------------------------------------------------------------
+ 
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("L"."L_SUPPKEY"="S"."S_SUPPKEY")
+   6 - filter(EXTRACT(YEAR FROM INTERNAL_FUNCTION("O_ORDERDATE"))=1991)
+   7 - access("O"."O_ORDERKEY"="L"."L_ORDERKEY")
+   8 - filter("L"."L_SUPPKEY">=0)
+ 
+Note
+-----
+   - this is an adaptive plan
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+               1  CCursor + sql area evicted
+              10  CPU used by this session
+              10  CPU used when call started
+              12  DB time
+             228  Number of read IOs issued
+              42  Requests to/from client
+              42  SQL*Net roundtrips to/from client
+              11  buffer is not pinned count
+             736  bytes received via SQL*Net from client
+           82927  bytes sent via SQL*Net to client
+              10  calls to get snapshot scn: kcmgss
+              15  calls to kcmgcs
+        59039744  cell physical IO interconnect bytes
+             727  cleanout - number of ktugct calls
+             727  cleanouts only - consistent read gets
+             727  commit txn count during cleanout
+            7993  consistent gets
+            7175  consistent gets direct
+             728  consistent gets examination
+             727  consistent gets examination (fastpath)
+             818  consistent gets from cache
+              90  consistent gets pin
+              71  consistent gets pin (fastpath)
+               3  enqueue releases
+               3  enqueue requests
+               4  execute count
+           16555  file io wait time
+              32  free buffer requested
+             727  immediate (CR) block cleanout applications
+               1  index fetch by key
+         6701056  logical read bytes from cache
+            6525  no work - consistent read gets
+             307  non-idle wait count
+               1  non-idle wait time
+               4  opened cursors cumulative
+               1  opened cursors current
+               1  parse count (hard)
+               4  parse count (total)
+               1  parse time cpu
+               1  parse time elapsed
+             248  physical read IO requests
+        59039744  physical read bytes
+             248  physical read total IO requests
+        59039744  physical read total bytes
+             228  physical read total multi block requests
+            7207  physical reads
+              32  physical reads cache
+              12  physical reads cache prefetch
+            7175  physical reads direct
+               1  process last non-idle time
+              12  recursive calls
+               1  recursive cpu usage
+               1  session cursor cache count
+            7993  session logical reads
+               3  shared hash latch upgrades - no wait
+               1  sorts (memory)
+            2010  sorts (rows)
+               3  table fetch by rowid
+            7249  table scan blocks gotten
+          453000  table scan disk non-IMC rows gotten
+          453000  table scan rows gotten
+               1  table scans (direct read)
+               1  table scans (long tables)
+               1  table scans (short tables)
+               1  user I/O wait time
+              43  user calls
+SQL> 
+SQL> set autotrace off
+Autotrace Disabled
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> create tablespace tsp1
+  2  extent management local autoallocate
+  3  segment space management auto
+  4  datafile 'newdf1.dbf' size 600m;
+
+Tablespace TSP1 created.
+
+SQL> 
+SQL> alter user csci317 quota 600m on tsp1;
+
+User CSCI317 altered.
+
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> 
+SQL> CREATE TABLE TASK_6(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEM_PKEY6 PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19      CONSTRAINT LINEITEM_FKEY16 FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEM_FKEY36 FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEM_FKEY46 FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP(PS_PARTKEY, PS_SUPPKEY),
+ 25      CONSTRAINT LINEITEM_FKEY66 FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEM_CHECK16 CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEM_CHECK26 CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEM_CHECK36 CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEM_CHECK46 CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      tablespace tsp1;
+
+Table TASK_6 created.
+
+SQL> 
+SQL> insert into task_6 select * from lineitem;
+
+1,800,093 rows inserted.
+
+SQL> 
+SQL> alter table task_6 add l_orderdate date;
+
+Table TASK_6 altered.
+
+SQL> alter table task_6 add l_suppname char(25);
+
+Table TASK_6 altered.
+
+SQL> alter table task_6 add l_suppaddress varchar(40);
+
+Table TASK_6 altered.
+
+SQL> 
+SQL> UPDATE task_6
+  2  SET l_orderdate = (
+  3      SELECT o_orderdate
+  4      FROM orderss
+  5      WHERE task_6.l_orderkey = orderss.o_orderkey),
+  6      l_suppname = (
+  7      SELECT s_name
+  8      FROM supplier
+  9      WHERE task_6.l_suppkey = supplier.s_suppkey),
+ 10      l_suppaddress = (
+ 11      SELECT s_address
+ 12      FROM supplier
+ 13      WHERE task_6.l_suppkey = supplier.s_suppkey);
+
+1,800,093 rows updated.
+
+SQL> set autotrace traceonly statistics on
+Autotrace TraceOnly
+ Exhibits the performance statistics with silent query output
+SP2-0158: unknown SET option "on"
+SQL> 
+SQL> select distinct l_suppname,l_suppaddress from task_6 where EXTRACT(year from l_orderdate)=1991;
+
+0 rows selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  26cr9d83k3g9z, child number 0
+-------------------------------------
+select distinct l_suppname,l_suppaddress from task_6 where EXTRACT(year 
+from l_orderdate)=1991
+ 
+Plan hash value: 3376908928
+ 
+----------------------------------------------
+| Id  | Operation          | Name   | E-Rows |
+----------------------------------------------
+|   0 | SELECT STATEMENT   |        |        |
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   1 |  HASH UNIQUE       |        |    515 |
+|*  2 |   TABLE ACCESS FULL| TASK_6 |    515 |
+----------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - filter(EXTRACT(YEAR FROM INTERNAL_FUNCTION("L_ORDERDATE"))=1991)
+ 
+Note
+-----
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   - dynamic statistics used: dynamic sampling (level=2)
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+              49  CPU used by this session
+              49  CPU used when call started
+             104  DB time
+               5  Requests to/from client
+              29  application wait time
+       383197184  cell physical IO interconnect bytes
+           46764  consistent gets
+           46625  consistent gets direct
+               3  consistent gets examination
+               1  consistent gets examination (fastpath)
+             139  consistent gets from cache
+             136  consistent gets pin
+              96  consistent gets pin (fastpath)
+               7  db block gets
+               7  db block gets from cache
+               3  db block gets from cache (fastpath)
+               4  enqueue conversions
+               7  enqueue releases
+               7  enqueue requests
+               1  enqueue waits
+               1  messages sent
+            1530  non-idle wait count
+              57  non-idle wait time
+               5  opened cursors cumulative
+               1  opened cursors current
+            1569  physical read total IO requests
+       383197184  physical read total bytes
+            1463  physical read total multi block requests
+               1  pinned cursors current
+               1  process last non-idle time
+               8  recursive calls
+           46771  session logical reads
+              24  user I/O wait time
+               6  user calls
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> drop tablespace tsp1 including contents and datafiles;
+
+Tablespace TSP1 dropped.
+
+SQL> 
+SQL> set echo off

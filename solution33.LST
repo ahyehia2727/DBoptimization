@@ -1,0 +1,1574 @@
+SQL> set echo on
+SQL> set feedback on
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> CREATE TABLESPACE DRIVE_C
+  2   EXTENT MANAGEMENT LOCAL UNIFORM SIZE 256K
+  3   SEGMENT SPACE MANAGEMENT AUTO
+  4   DATAFILE 'drivec.dbf'
+  5     SIZE 300M;
+
+TABLESPACE DRIVE_C created.
+
+SQL> 
+SQL> CREATE TABLESPACE DRIVE_D
+  2   EXTENT MANAGEMENT LOCAL UNIFORM SIZE 256K
+  3   SEGMENT SPACE MANAGEMENT AUTO
+  4   DATAFILE 'drived.dbf'
+  5     SIZE 300M;
+
+TABLESPACE DRIVE_D created.
+
+SQL> 
+SQL> ALTER USER CSCI317 QUOTA 300M ON DRIVE_C;
+
+User CSCI317 altered.
+
+SQL> ALTER USER CSCI317 QUOTA 300M ON DRIVE_D;
+
+User CSCI317 altered.
+
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> 
+SQL> CREATE TABLE REGION_NEW(
+  2  R_REGIONKEY	NUMBER(12)	NOT NULL,
+  3  R_NAME		CHAR(25)	NOT NULL,
+  4  R_COMMENT	VARCHAR(152)	NOT NULL,
+  5  	CONSTRAINT REGION_PKEYN PRIMARY KEY(R_REGIONKEY),
+  6  	CONSTRAINT REGION_CHECK1N CHECK(R_REGIONKEY >= 0) )
+  7      tablespace DRIVE_D
+  8      pctfree 0;
+
+Table REGION_NEW created.
+
+SQL> 
+SQL> CREATE TABLE NATION_NEW(
+  2  N_NATIONKEY	NUMBER(12)	NOT NULL,
+  3  N_NAME		CHAR(25)	NOT NULL,
+  4  N_REGIONKEY	NUMBER(12)	NOT NULL,
+  5  N_COMMENT	VARCHAR(152)	NOT NULL,
+  6  	CONSTRAINT NATION_PKEYN PRIMARY KEY (N_NATIONKEY),
+  7  	CONSTRAINT NATION_FKEY1N FOREIGN KEY (N_REGIONKEY)
+  8  		REFERENCES REGION_NEW(R_REGIONKEY),
+  9  	CONSTRAINT NATION_CHECK1N CHECK(N_NATIONKEY >= 0) )
+ 10      tablespace DRIVE_D
+ 11      pctfree 0;
+
+Table NATION_NEW created.
+
+SQL> 
+SQL> CREATE TABLE PART_NEW(
+  2  P_PARTKEY 	NUMBER(12) 	NOT NULL,
+  3  P_NAME		VARCHAR(55)	NOT NULL,
+  4  P_MFGR		VARCHAR(25)	NOT NULL,
+  5  P_BRAND		CHAR(10)	NOT NULL,
+  6  P_TYPE		VARCHAR(25)	NOT NULL,
+  7  P_SIZE		NUMBER(12)	NOT NULL,
+  8  P_CONTAINER 	CHAR(10)	NOT NULL,
+  9  P_RETAILPRICE	NUMBER(12,2)	NOT NULL,
+ 10  P_COMMENT	VARCHAR(23)	NOT NULL,
+ 11  	CONSTRAINT PART_PEKEYN PRIMARY KEY (P_PARTKEY),
+ 12  	CONSTRAINT PART_CHECK1N CHECK(P_PARTKEY >= 0),
+ 13  	CONSTRAINT PART_CHECK2N CHECK(P_SIZE >= 0),
+ 14  	CONSTRAINT PART_CHECK3N CHECK(P_RETAILPRICE >= 0) )
+ 15      tablespace DRIVE_D
+ 16      pctfree 0;
+
+Table PART_NEW created.
+
+SQL> 
+SQL> CREATE TABLE SUPPLIER_NEW(
+  2  S_SUPPKEY 	NUMBER(12)	NOT NULL,
+  3  S_NAME		CHAR(25)	NOT NULL,
+  4  S_ADDRESS	VARCHAR(40)	NOT NULL,
+  5  S_NATIONKEY	NUMBER(12)	NOT NULL,
+  6  S_PHONE 	CHAR(15)	NOT NULL,
+  7  S_ACCTBAL	NUMBER(12,2)	NOT NULL,
+  8  S_COMMENT	VARCHAR(101)	NOT NULL,
+  9  	CONSTRAINT SUPPLIER_PKEYN PRIMARY KEY (S_SUPPKEY),
+ 10  	CONSTRAINT SUPPLIER_FKEY1N FOREIGN kEY (S_NATIONKEY)
+ 11  		REFERENCES NATION_NEW(N_NATIONKEY),
+ 12  	CONSTRAINT SUPPLIER_CHECK1N CHECK(S_SUPPKEY >= 0) )
+ 13      tablespace DRIVE_D
+ 14      pctfree 0;
+
+Table SUPPLIER_NEW created.
+
+SQL> 
+SQL> CREATE TABLE PARTSUPP_NEW(
+  2  PS_PARTKEY 	NUMBER(12)	NOT NULL,
+  3  PS_SUPPKEY	NUMBER(12)	NOT NULL,
+  4  PS_AVAILQTY	NUMBER(12)	NOT NULL,
+  5  PS_SUPPLYCOST	NUMBER(12,2)	NOT NULL,
+  6  PS_COMMENT	VARCHAR(199)	NOT NULL,
+  7  	CONSTRAINT PARTSUPP_PKEYN PRIMARY KEY (PS_PARTKEY, PS_SUPPKEY),
+  8  	CONSTRAINT PARTSUPP_FKEY1N FOREIGN KEY (PS_PARTKEY)
+  9  		REFERENCES PART_NEW(P_PARTKEY),
+ 10  	CONSTRAINT PARTSUPP_FKEY2N FOREIGN kEY (PS_SUPPKEY)
+ 11  		REFERENCES SUPPLIER_NEW(S_SUPPKEY),
+ 12  	CONSTRAINT PARTSUPP_CHECK1N CHECK(PS_PARTKEY >= 0),
+ 13  	CONSTRAINT PARTSUPP_CHECK2N CHECK(PS_AVAILQTY >= 0),
+ 14  	CONSTRAINT PARTSUPP_CHECK3N CHECK(PS_SUPPLYCOST >= 0) )
+ 15      tablespace DRIVE_D
+ 16      pctfree 0;
+
+Table PARTSUPP_NEW created.
+
+SQL> 
+SQL> CREATE TABLE CUSTOMER_NEW(
+  2  C_CUSTKEY	NUMBER(12)	NOT NULL,
+  3  C_NAME 		VARCHAR(25)	NOT NULL,
+  4  C_ADDRESS	VARCHAR(40)	NOT NULL,
+  5  C_NATIONKEY	NUMBER(12)	NOT NULL,
+  6  C_PHONE		CHAR(15)	NOT NULL,
+  7  C_ACCTBAL	NUMBER(12,2)	NOT NULL,
+  8  C_MKTSEGMENT	CHAR(10)	NOT NULL,
+  9  C_COMMENT	VARCHAR(117)	NOT NULL,
+ 10  	CONSTRAINT CUSTOMER_PKEYN PRIMARY KEY(C_CUSTKEY),
+ 11  	CONSTRAINT CUSTOMER_FKEY1N FOREIGN kEY (C_NATIONKEY)
+ 12  		REFERENCES NATION_NEW(N_NATIONKEY),
+ 13  	CONSTRAINT CUSTOMER_CHECK1N CHECK(C_CUSTKEY >= 0) )
+ 14      tablespace DRIVE_D;
+
+Table CUSTOMER_NEW created.
+
+SQL> 
+SQL> CREATE TABLE ORDERSS_NEW(
+  2  O_ORDERKEY	NUMBER(12)	NOT NULL,
+  3  O_CUSTKEY	NUMBER(12)	NOT NULL,
+  4  O_ORDERSTATUS	CHAR(1)		NOT NULL,
+  5  O_TOTALPRICE	NUMBER(12,2)	NOT NULL,
+  6  O_ORDERDATE	DATE		NOT NULL,
+  7  O_ORDERPRIORITY CHAR(15)	NOT NULL,
+  8  O_CLERK		CHAR(15)	NOT NULL,
+  9  O_SHIPPRIORITY	NUMBER(12)	NOT NULL,
+ 10  O_COMMENT	VARCHAR(79)	NOT NULL,
+ 11  	CONSTRAINT ORDERS_PKEYN PRIMARY KEY (O_ORDERKEY),
+ 12  	CONSTRAINT ORDERS_FKEY1N FOREIGN kEY (O_CUSTKEY)
+ 13  		REFERENCES CUSTOMER_NEW(C_CUSTKEY),
+ 14  	CONSTRAINT ORDER_CHECK1N CHECK( O_TOTALPRICE >= 0) )
+ 15      tablespace DRIVE_D;
+
+Table ORDERSS_NEW created.
+
+SQL> 
+SQL> CREATE TABLE LINEITEM_NEWW(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEM_PKEYN PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19  	CONSTRAINT LINEITEM_FKEY1N FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS_NEW(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEM_FKEY2N FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART_NEW(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEM_FKEY3N FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP_NEW(PS_PARTKEY, PS_SUPPKEY),
+ 25  	CONSTRAINT LINEITEM_FKEY4N FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER_NEW(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEM_CHECK1N CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEM_CHECK2N CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEM_CHECK3N CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEM_CHECK4N CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      tablespace DRIVE_C
+ 32      pctfree 0;
+
+Table LINEITEM_NEWW created.
+
+SQL> 
+SQL> insert into region_new select * from region;
+
+5 rows inserted.
+
+SQL> insert into nation_new select * from nation;
+
+25 rows inserted.
+
+SQL> insert into part_new select * from part;
+
+60,000 rows inserted.
+
+SQL> insert into supplier_new select * from supplier;
+
+3,000 rows inserted.
+
+SQL> insert into partsupp_new select * from partsupp;
+
+240,000 rows inserted.
+
+SQL> insert into customer_new select * from customer;
+
+45,000 rows inserted.
+
+SQL> insert into orderss_new select * from orderss;
+
+450,000 rows inserted.
+
+SQL> insert into lineitem_neww select * from lineitem;
+
+1,800,093 rows inserted.
+
+SQL> 
+SQL> set timing on
+SQL> 
+SQL> select sum(lineitem.l_quantity) from lineitem 
+  2  join orderss on lineitem.L_orderkey=orderss.O_orderkey 
+  3  join customer on customer.c_custkey=orderss.o_custkey 
+  4  and C_address='F2YYbRT2EV';
+
+SUM(LINEITEM.L_QUANTITY)
+------------------------
+                     851
+
+1 row selected. 
+
+Elapsed: 00:00:00.114
+SQL> 
+SQL> select distinct part.p_name from part,lineitem where part.p_partkey=lineitem.l_partkey and lineitem.l_shipdate=TO_DATE('20-02-1992','dd-mm-yyyy');
+
+P_NAME                                                 
+-------------------------------------------------------
+medium dodger sienna bisque honeydew
+linen chocolate peach rosy spring
+maroon wheat dark cyan antique
+light chiffon cyan orchid green
+azure sky moccasin goldenrod coral
+magenta black aquamarine linen puff
+sky maroon honeydew beige grey
+sienna coral gainsboro drab aquamarine
+spring cream blue indian yellow
+hot lavender cornsilk lawn cyan
+blue azure deep olive burlywood
+
+P_NAME                                                 
+-------------------------------------------------------
+frosted linen peach forest lawn
+mint bisque sandy light cream
+bisque cyan tan moccasin royal
+ivory slate honeydew lawn mint
+plum floral chiffon deep black
+tomato floral frosted snow white
+indian frosted ghost snow plum
+blue yellow saddle lemon chiffon
+blue coral aquamarine floral sandy
+blanched deep dodger peach linen
+dodger navy almond rose chiffon
+
+P_NAME                                                 
+-------------------------------------------------------
+chiffon pale misty linen coral
+red midnight light mint blue
+orange papaya beige pale green
+ghost indian powder yellow sienna
+powder navy turquoise cornsilk plum
+brown cyan cream red chocolate
+almond bisque lawn ghost moccasin
+almond navajo olive snow antique
+white misty firebrick blanched lime
+chiffon aquamarine snow maroon medium
+lavender plum antique beige yellow
+
+P_NAME                                                 
+-------------------------------------------------------
+firebrick aquamarine metallic spring sky
+plum lime blue cornflower firebrick
+chiffon tan medium lawn steel
+olive tomato mint navajo aquamarine
+pink deep blue tomato rosy
+dim bisque blush indian sandy
+chiffon thistle ghost black firebrick
+blanched olive navy goldenrod lemon
+azure lace salmon ghost green
+cornsilk burlywood sky dark purple
+smoke dodger firebrick gainsboro misty
+
+P_NAME                                                 
+-------------------------------------------------------
+orchid rosy spring black grey
+sandy honeydew indian peru ghost
+burnished gainsboro navajo tan drab
+antique khaki snow ivory violet
+hot brown spring lawn navy
+blanched almond green burlywood spring
+salmon bisque deep dodger smoke
+burnished metallic medium pink cyan
+lime olive maroon rose cornflower
+burlywood seashell rosy indian goldenrod
+navajo goldenrod beige chocolate floral
+
+P_NAME                                                 
+-------------------------------------------------------
+coral medium dark salmon red
+blanched honeydew pale metallic orchid
+olive deep royal indian chartreuse
+pink almond yellow salmon sandy
+brown yellow olive pink mint
+olive cornsilk deep yellow light
+royal cream metallic linen papaya
+mint aquamarine cream royal lawn
+burlywood olive cornsilk azure rosy
+coral royal linen wheat ghost
+sandy lavender black cornsilk linen
+
+P_NAME                                                 
+-------------------------------------------------------
+beige snow mint rosy blue
+firebrick deep burlywood pale azure
+deep lawn burnished sienna black
+frosted drab dodger smoke bisque
+bisque honeydew lavender lemon coral
+magenta cornflower medium bisque mint
+navy tomato antique tan sandy
+firebrick snow navajo almond goldenrod
+cyan chartreuse goldenrod spring black
+moccasin powder slate chiffon firebrick
+blush ivory chartreuse purple turquoise
+
+P_NAME                                                 
+-------------------------------------------------------
+burnished violet cornsilk papaya blush
+rose metallic moccasin sandy chiffon
+violet chiffon chartreuse gainsboro sandy
+navy frosted forest firebrick powder
+cornflower sky lawn orchid ivory
+gainsboro brown salmon ivory frosted
+beige chiffon firebrick powder lime
+floral peach navy azure seashell
+deep blush linen goldenrod navajo
+peach purple khaki blue seashell
+antique deep hot lemon white
+
+P_NAME                                                 
+-------------------------------------------------------
+lawn beige blanched coral khaki
+sienna blanched orange metallic tomato
+black misty peru yellow lace
+slate peach burlywood seashell goldenrod
+royal orange chiffon steel white
+lawn smoke saddle pink navy
+pink bisque brown metallic firebrick
+peru bisque midnight lace firebrick
+beige green tan maroon azure
+linen deep burnished chocolate dim
+seashell lace forest blush antique
+
+P_NAME                                                 
+-------------------------------------------------------
+black violet beige lemon turquoise
+burlywood chiffon pink white royal
+khaki cream ghost almond dark
+red sandy lime magenta puff
+drab chiffon spring cornflower azure
+dim sky tan maroon cream
+burlywood cornflower dark light pink
+yellow chartreuse honeydew moccasin burlywood
+ghost floral chocolate grey moccasin
+royal papaya blue snow cornflower
+blue medium metallic peru moccasin
+
+P_NAME                                                 
+-------------------------------------------------------
+linen seashell rose peach burlywood
+cream linen red powder peach
+plum royal mint floral pink
+frosted dark yellow khaki green
+burnished aquamarine slate medium forest
+black sandy medium saddle midnight
+rose hot burnished deep sienna
+black frosted hot navy chocolate
+cornflower olive deep burnished dark
+mint white dim burnished goldenrod
+pink tomato ivory misty honeydew
+
+P_NAME                                                 
+-------------------------------------------------------
+papaya linen slate navy yellow
+goldenrod orange beige navy brown
+almond drab lavender bisque purple
+slate magenta wheat lemon brown
+white magenta linen spring royal
+turquoise navajo cornsilk dark lemon
+metallic snow hot lime chocolate
+purple blanched floral pink dim
+tomato spring black pink maroon
+almond lawn magenta hot olive
+chocolate royal blanched cyan peru
+
+P_NAME                                                 
+-------------------------------------------------------
+burlywood light hot white blush
+burnished blanched firebrick royal red
+light azure lace sky khaki
+dark moccasin ivory dim beige
+brown hot almond seashell navajo
+dim frosted honeydew royal cornflower
+lavender orange wheat green maroon
+linen cyan bisque wheat coral
+papaya drab medium burnished cyan
+spring mint pink cornsilk brown
+bisque ghost mint pale grey
+
+P_NAME                                                 
+-------------------------------------------------------
+rosy cream antique indian sienna
+blue pink medium firebrick metallic
+blue lemon linen khaki cornsilk
+indian dodger chartreuse goldenrod blush
+gainsboro pink midnight antique cream
+deep red lavender spring drab
+sandy purple cornflower firebrick aquamarine
+dim puff cornflower mint blush
+goldenrod burnished lemon rose violet
+ivory purple rosy thistle slate
+olive tan blanched chiffon rosy
+
+P_NAME                                                 
+-------------------------------------------------------
+grey antique frosted salmon turquoise
+cornflower red moccasin sky grey
+maroon cream grey beige cornsilk
+frosted plum peach drab cream
+steel aquamarine beige pink frosted
+almond wheat bisque ghost chiffon
+ghost gainsboro dark tan brown
+spring cornsilk rose coral lawn
+salmon royal spring pink navajo
+peach honeydew medium firebrick sienna
+hot sandy navy deep slate
+
+P_NAME                                                 
+-------------------------------------------------------
+plum peach indian azure orange
+gainsboro light cream cyan royal
+blue burnished powder rosy floral
+brown navajo dark moccasin burlywood
+salmon red moccasin blush black
+pink turquoise floral cyan violet
+papaya lemon honeydew powder orchid
+peru aquamarine blue yellow chiffon
+chiffon brown mint burlywood white
+brown sky chartreuse antique saddle
+maroon pale white cyan dodger
+
+P_NAME                                                 
+-------------------------------------------------------
+firebrick gainsboro grey sienna drab
+goldenrod frosted lawn floral pink
+blue honeydew azure medium frosted
+purple chartreuse lemon maroon turquoise
+cream goldenrod powder drab lace
+lemon spring lime burnished powder
+navajo black seashell yellow hot
+navajo midnight green orange linen
+lawn ghost deep moccasin spring
+cornsilk dim tomato lemon beige
+floral linen cream chartreuse dim
+
+P_NAME                                                 
+-------------------------------------------------------
+burlywood red khaki ivory blue
+ivory lime deep moccasin peach
+steel dark cornflower plum pink
+chiffon spring grey pink rose
+black yellow slate antique rosy
+lace ivory floral chocolate olive
+beige papaya navy chocolate blanched
+drab lawn honeydew misty frosted
+salmon cream khaki plum floral
+medium spring brown ghost floral
+dark light magenta cornflower khaki
+
+P_NAME                                                 
+-------------------------------------------------------
+pink dark lemon khaki metallic
+steel azure lawn blanched lime
+plum sandy violet seashell powder
+yellow cream dodger white metallic
+lace blanched ivory wheat lavender
+olive powder bisque gainsboro burlywood
+almond brown powder cornflower cyan
+goldenrod snow beige almond bisque
+hot chocolate olive gainsboro salmon
+cornsilk blush almond hot brown
+sienna lime navajo beige white
+
+P_NAME                                                 
+-------------------------------------------------------
+aquamarine tomato peru chocolate dark
+lavender dark coral cornsilk sky
+grey blush firebrick cyan forest
+almond navajo orchid spring chartreuse
+salmon sky papaya lawn coral
+beige drab navajo deep forest
+violet medium bisque floral chocolate
+blush dim pale chartreuse black
+moccasin mint puff beige steel
+snow purple peach tomato medium
+puff honeydew cyan moccasin pale
+
+P_NAME                                                 
+-------------------------------------------------------
+violet seashell azure frosted tan
+olive cornsilk brown moccasin bisque
+misty maroon dim bisque gainsboro
+dark orchid black tomato green
+grey navajo cyan blue yellow
+lime slate thistle beige blanched
+seashell purple black chartreuse lemon
+blush bisque lace papaya rose
+pink beige snow lavender steel
+beige violet gainsboro moccasin aquamarine
+bisque sky tomato midnight chiffon
+
+P_NAME                                                 
+-------------------------------------------------------
+green maroon royal cyan pale
+black frosted honeydew cornflower lime
+blanched almond lawn coral linen
+spring goldenrod thistle white sandy
+frosted honeydew red turquoise spring
+tan mint cyan forest drab
+firebrick red brown antique magenta
+dodger dim chiffon burlywood floral
+mint goldenrod hot violet orchid
+coral drab lawn peru smoke
+blush chocolate orange seashell wheat
+
+P_NAME                                                 
+-------------------------------------------------------
+lavender lawn cornflower firebrick cream
+cream salmon black hot snow
+sky chocolate papaya chiffon grey
+violet midnight ivory misty medium
+beige orchid chocolate ghost drab
+floral yellow peach sandy lime
+maroon papaya olive blush forest
+burnished bisque indian ivory hot
+frosted bisque lime peru powder
+azure blue lemon violet maroon
+cornflower brown papaya goldenrod cornsilk
+
+P_NAME                                                 
+-------------------------------------------------------
+burnished olive lawn cyan cornsilk
+burnished navajo blue cyan lawn
+plum bisque lawn smoke medium
+salmon dim indian powder azure
+dim almond smoke azure blue
+floral chartreuse blue tomato purple
+deep yellow rose dim midnight
+red chiffon moccasin lawn forest
+green chocolate black blush royal
+medium peach lawn cream grey
+medium navy black turquoise cream
+
+P_NAME                                                 
+-------------------------------------------------------
+purple indian thistle chocolate tan
+burnished coral cornflower drab blue
+slate orange puff plum coral
+lime chocolate lawn black sandy
+forest plum firebrick papaya indian
+antique salmon navy cornsilk lime
+light firebrick salmon red dark
+cornflower cream blue deep metallic
+pink lawn midnight forest lavender
+deep red peru blue lawn
+peach gainsboro forest brown lawn
+
+P_NAME                                                 
+-------------------------------------------------------
+black purple burnished violet midnight
+dodger forest maroon salmon tomato
+lime medium chartreuse white burlywood
+chocolate linen goldenrod lavender wheat
+tan sienna black almond grey
+metallic ivory orchid indian green
+floral coral royal chocolate plum
+royal misty drab olive goldenrod
+puff turquoise ivory chiffon khaki
+floral beige black dim antique
+forest papaya midnight chartreuse tan
+
+P_NAME                                                 
+-------------------------------------------------------
+rose blanched indian tomato hot
+lime blue blush rose blanched
+indian sky dark olive green
+azure cornflower beige green honeydew
+cream lemon pink grey beige
+antique blue black peach seashell
+forest hot burnished wheat linen
+lavender misty brown peach beige
+dark light sky cyan dim
+peru slate red blush grey
+burlywood wheat ivory misty sandy
+
+P_NAME                                                 
+-------------------------------------------------------
+green brown linen honeydew lavender
+floral chocolate spring midnight forest
+lavender black blanched cornflower goldenrod
+cream ghost dark slate lavender
+burlywood forest ghost antique deep
+snow salmon misty saddle sandy
+grey sandy bisque violet brown
+gainsboro dim dark lavender ivory
+magenta beige coral cornflower floral
+slate burlywood firebrick metallic yellow
+burnished floral magenta blanched saddle
+
+P_NAME                                                 
+-------------------------------------------------------
+metallic lemon bisque misty lace
+green lawn firebrick lemon peach
+lawn linen olive antique pink
+dim chartreuse tan cornsilk burnished
+azure smoke puff beige lawn
+powder lime puff chocolate lawn
+steel misty dark black cyan
+blush pale chiffon grey wheat
+chartreuse blanched magenta khaki lawn
+ghost grey midnight antique lime
+green pale chocolate steel dodger
+
+P_NAME                                                 
+-------------------------------------------------------
+dim powder cyan papaya drab
+ivory beige powder honeydew green
+tomato powder khaki dodger cyan
+beige coral lavender deep lemon
+cornflower brown spring turquoise grey
+antique khaki lawn chocolate chartreuse
+sky burnished azure steel papaya
+khaki misty powder lawn dim
+dodger red gainsboro thistle rose
+frosted ghost ivory red deep
+
+329 rows selected. 
+
+Elapsed: 00:00:00.465
+SQL> 
+SQL> select distinct part.p_name from supplier join partsupp on partsupp.ps_suppkey=supplier.s_suppkey join part on part.p_partkey=partsupp.ps_partkey and supplier.s_address='iYzUIypKhC0Y';
+
+P_NAME                                                 
+-------------------------------------------------------
+cornflower white rosy violet cream
+lime antique bisque wheat dim
+cornsilk chartreuse turquoise brown cyan
+pink drab firebrick dodger chartreuse
+thistle orange steel powder chocolate
+coral dark yellow indian burnished
+pale metallic snow dim orange
+forest khaki red cyan chiffon
+navy papaya dim black ghost
+saddle firebrick coral white chocolate
+beige spring medium thistle misty
+
+P_NAME                                                 
+-------------------------------------------------------
+steel peach black snow papaya
+sandy azure coral orange blanched
+magenta brown misty blue seashell
+misty lime red cream sky
+navajo misty grey goldenrod puff
+peach plum gainsboro chartreuse sienna
+cornflower rosy black deep chocolate
+rose lawn moccasin dark lavender
+yellow tomato blanched burlywood azure
+brown hot deep dodger black
+chartreuse olive tomato brown blanched
+
+P_NAME                                                 
+-------------------------------------------------------
+aquamarine honeydew cornsilk blanched navy
+papaya salmon blue chartreuse peru
+burlywood navajo grey cyan slate
+wheat deep chartreuse floral papaya
+cream seashell turquoise peru lime
+lavender dim cornsilk blush thistle
+cyan aquamarine puff saddle gainsboro
+maroon moccasin deep rosy dim
+aquamarine turquoise blanched indian mint
+lime spring goldenrod plum forest
+royal forest aquamarine blush khaki
+
+P_NAME                                                 
+-------------------------------------------------------
+tan yellow white sienna metallic
+smoke cornsilk chiffon magenta powder
+ghost khaki lawn pale dim
+tomato cornsilk almond blue orange
+green dodger coral blue antique
+goldenrod misty olive blush sandy
+hot navajo azure beige cyan
+gainsboro forest red metallic burnished
+gainsboro peach white navy rose
+aquamarine powder navy lemon dark
+forest beige indian chartreuse chocolate
+
+P_NAME                                                 
+-------------------------------------------------------
+salmon chocolate pink lemon blush
+thistle blush azure magenta gainsboro
+papaya brown sky peach pink
+forest black chocolate hot rose
+cornsilk cream grey dark forest
+magenta ghost navy lace tomato
+coral blanched black beige hot
+floral dim midnight firebrick lawn
+hot aquamarine cornflower wheat burlywood
+dodger orange ghost snow lawn
+sandy chiffon mint powder cream
+
+P_NAME                                                 
+-------------------------------------------------------
+coral cyan spring chocolate indian
+cream navy ivory steel dark
+navy ivory floral puff yellow
+firebrick mint beige magenta tomato
+steel navy indian grey peach
+midnight almond slate azure firebrick
+royal deep saddle hot mint
+rosy peru papaya grey black
+medium navajo blanched blue lemon
+bisque light steel navajo saddle
+pink hot cream rose dodger
+
+P_NAME                                                 
+-------------------------------------------------------
+dark hot steel royal black
+tomato medium cyan metallic purple
+plum orchid mint honeydew steel
+almond azure orange bisque lavender
+lawn dark thistle turquoise misty
+gainsboro peach rose maroon tomato
+thistle medium indian burlywood blue
+spring aquamarine firebrick drab cornflower
+dodger peach powder yellow deep
+purple wheat rose red forest
+chocolate khaki salmon steel forest
+
+P_NAME                                                 
+-------------------------------------------------------
+coral purple saddle khaki moccasin
+moccasin ivory blanched grey tomato
+tan tomato saddle moccasin coral
+
+80 rows selected. 
+
+Elapsed: 00:00:00.038
+SQL> 
+SQL> select s_name from supplier,nation where supplier.s_nationkey=nation.n_nationkey and n_name='INDIA';
+
+S_NAME                   
+-------------------------
+Supplier#000000348       
+Supplier#000000421       
+Supplier#000000435       
+Supplier#000002790       
+Supplier#000002795       
+Supplier#000002139       
+Supplier#000000235       
+Supplier#000000238       
+Supplier#000000241       
+Supplier#000000245       
+Supplier#000000282       
+
+S_NAME                   
+-------------------------
+Supplier#000000303       
+Supplier#000000308       
+Supplier#000000325       
+Supplier#000000346       
+Supplier#000000347       
+Supplier#000000060       
+Supplier#000000061       
+Supplier#000000102       
+Supplier#000000124       
+Supplier#000000136       
+Supplier#000000668       
+
+S_NAME                   
+-------------------------
+Supplier#000000671       
+Supplier#000000693       
+Supplier#000000757       
+Supplier#000000759       
+Supplier#000000012       
+Supplier#000000015       
+Supplier#000000039       
+Supplier#000000517       
+Supplier#000000522       
+Supplier#000000547       
+Supplier#000000551       
+
+S_NAME                   
+-------------------------
+Supplier#000000601       
+Supplier#000000611       
+Supplier#000000638       
+Supplier#000000786       
+Supplier#000000795       
+Supplier#000000805       
+Supplier#000000446       
+Supplier#000000457       
+Supplier#000000958       
+Supplier#000001015       
+Supplier#000001031       
+
+S_NAME                   
+-------------------------
+Supplier#000001037       
+Supplier#000001040       
+Supplier#000001241       
+Supplier#000001278       
+Supplier#000001289       
+Supplier#000001308       
+Supplier#000001320       
+Supplier#000001328       
+Supplier#000001340       
+Supplier#000001352       
+Supplier#000000931       
+
+S_NAME                   
+-------------------------
+Supplier#000000853       
+Supplier#000000871       
+Supplier#000000878       
+Supplier#000000891       
+Supplier#000000892       
+Supplier#000000901       
+Supplier#000000912       
+Supplier#000001177       
+Supplier#000001777       
+Supplier#000002863       
+Supplier#000002889       
+
+S_NAME                   
+-------------------------
+Supplier#000002894       
+Supplier#000002945       
+Supplier#000001694       
+Supplier#000001754       
+Supplier#000001483       
+Supplier#000001507       
+Supplier#000001514       
+Supplier#000001516       
+Supplier#000001530       
+Supplier#000001556       
+Supplier#000001598       
+
+S_NAME                   
+-------------------------
+Supplier#000001613       
+Supplier#000002119       
+Supplier#000002121       
+Supplier#000002127       
+Supplier#000002129       
+Supplier#000001377       
+Supplier#000001395       
+Supplier#000001403       
+Supplier#000001406       
+Supplier#000001414       
+Supplier#000001437       
+
+S_NAME                   
+-------------------------
+Supplier#000001453       
+Supplier#000001460       
+Supplier#000001464       
+Supplier#000001988       
+Supplier#000002041       
+Supplier#000001799       
+Supplier#000001803       
+Supplier#000001877       
+Supplier#000001894       
+Supplier#000001905       
+Supplier#000001906       
+
+S_NAME                   
+-------------------------
+Supplier#000002600       
+Supplier#000002624       
+Supplier#000002639       
+Supplier#000002695       
+Supplier#000002726       
+Supplier#000002727       
+Supplier#000002747       
+Supplier#000002466       
+Supplier#000002478       
+Supplier#000002479       
+Supplier#000002532       
+
+S_NAME                   
+-------------------------
+Supplier#000002563       
+Supplier#000002568       
+Supplier#000002569       
+Supplier#000002296       
+Supplier#000002339       
+Supplier#000002340       
+Supplier#000002342       
+Supplier#000002348       
+Supplier#000002355       
+Supplier#000002372       
+Supplier#000002387       
+
+S_NAME                   
+-------------------------
+Supplier#000002421       
+Supplier#000002431       
+Supplier#000002156       
+Supplier#000002210       
+Supplier#000002246       
+Supplier#000002254       
+
+127 rows selected. 
+
+Elapsed: 00:00:00.007
+SQL> 
+SQL> 
+SQL> select sum(lineitem_new.l_quantity) from lineitem_new 
+  2  join orderss_new on lineitem_new.L_orderkey=orderss_new.O_orderkey 
+  3  join customer_new on customer_new.c_custkey=orderss_new.o_custkey 
+  4  and C_address='F2YYbRT2EV';
+
+SUM(LINEITEM_NEW.L_QUANTITY)
+----------------------------
+                         851
+
+1 row selected. 
+
+Elapsed: 00:00:00.230
+SQL> 
+SQL> select distinct part_new.p_name from part_new,lineitem_new where part_new.p_partkey=lineitem_new.l_partkey and lineitem_new.l_shipdate=TO_DATE('20-02-1992','dd-mm-yyyy');
+
+P_NAME                                                 
+-------------------------------------------------------
+medium dodger sienna bisque honeydew
+linen chocolate peach rosy spring
+maroon wheat dark cyan antique
+magenta black aquamarine linen puff
+light chiffon cyan orchid green
+azure sky moccasin goldenrod coral
+sky maroon honeydew beige grey
+sienna coral gainsboro drab aquamarine
+spring cream blue indian yellow
+blue azure deep olive burlywood
+hot lavender cornsilk lawn cyan
+
+P_NAME                                                 
+-------------------------------------------------------
+frosted linen peach forest lawn
+plum floral chiffon deep black
+ivory slate honeydew lawn mint
+mint bisque sandy light cream
+bisque cyan tan moccasin royal
+tomato floral frosted snow white
+indian frosted ghost snow plum
+blue yellow saddle lemon chiffon
+blue coral aquamarine floral sandy
+blanched deep dodger peach linen
+dodger navy almond rose chiffon
+
+P_NAME                                                 
+-------------------------------------------------------
+chiffon pale misty linen coral
+red midnight light mint blue
+orange papaya beige pale green
+powder navy turquoise cornsilk plum
+brown cyan cream red chocolate
+ghost indian powder yellow sienna
+almond bisque lawn ghost moccasin
+almond navajo olive snow antique
+chiffon aquamarine snow maroon medium
+white misty firebrick blanched lime
+lavender plum antique beige yellow
+
+P_NAME                                                 
+-------------------------------------------------------
+plum lime blue cornflower firebrick
+firebrick aquamarine metallic spring sky
+chiffon tan medium lawn steel
+olive tomato mint navajo aquamarine
+pink deep blue tomato rosy
+dim bisque blush indian sandy
+blanched olive navy goldenrod lemon
+chiffon thistle ghost black firebrick
+azure lace salmon ghost green
+cornsilk burlywood sky dark purple
+orchid rosy spring black grey
+
+P_NAME                                                 
+-------------------------------------------------------
+smoke dodger firebrick gainsboro misty
+sandy honeydew indian peru ghost
+burnished gainsboro navajo tan drab
+antique khaki snow ivory violet
+hot brown spring lawn navy
+blanched almond green burlywood spring
+salmon bisque deep dodger smoke
+burnished metallic medium pink cyan
+lime olive maroon rose cornflower
+burlywood seashell rosy indian goldenrod
+navajo goldenrod beige chocolate floral
+
+P_NAME                                                 
+-------------------------------------------------------
+coral medium dark salmon red
+blanched honeydew pale metallic orchid
+olive deep royal indian chartreuse
+pink almond yellow salmon sandy
+olive cornsilk deep yellow light
+royal cream metallic linen papaya
+mint aquamarine cream royal lawn
+brown yellow olive pink mint
+coral royal linen wheat ghost
+burlywood olive cornsilk azure rosy
+beige snow mint rosy blue
+
+P_NAME                                                 
+-------------------------------------------------------
+firebrick deep burlywood pale azure
+sandy lavender black cornsilk linen
+frosted drab dodger smoke bisque
+deep lawn burnished sienna black
+bisque honeydew lavender lemon coral
+firebrick snow navajo almond goldenrod
+cyan chartreuse goldenrod spring black
+moccasin powder slate chiffon firebrick
+blush ivory chartreuse purple turquoise
+burnished violet cornsilk papaya blush
+magenta cornflower medium bisque mint
+
+P_NAME                                                 
+-------------------------------------------------------
+navy tomato antique tan sandy
+violet chiffon chartreuse gainsboro sandy
+rose metallic moccasin sandy chiffon
+navy frosted forest firebrick powder
+gainsboro brown salmon ivory frosted
+cornflower sky lawn orchid ivory
+beige chiffon firebrick powder lime
+deep blush linen goldenrod navajo
+floral peach navy azure seashell
+peach purple khaki blue seashell
+antique deep hot lemon white
+
+P_NAME                                                 
+-------------------------------------------------------
+sienna blanched orange metallic tomato
+lawn beige blanched coral khaki
+black misty peru yellow lace
+slate peach burlywood seashell goldenrod
+lawn smoke saddle pink navy
+royal orange chiffon steel white
+pink bisque brown metallic firebrick
+peru bisque midnight lace firebrick
+linen deep burnished chocolate dim
+beige green tan maroon azure
+seashell lace forest blush antique
+
+P_NAME                                                 
+-------------------------------------------------------
+burlywood chiffon pink white royal
+khaki cream ghost almond dark
+red sandy lime magenta puff
+black violet beige lemon turquoise
+dim sky tan maroon cream
+burlywood cornflower dark light pink
+drab chiffon spring cornflower azure
+ghost floral chocolate grey moccasin
+yellow chartreuse honeydew moccasin burlywood
+royal papaya blue snow cornflower
+blue medium metallic peru moccasin
+
+P_NAME                                                 
+-------------------------------------------------------
+linen seashell rose peach burlywood
+cream linen red powder peach
+plum royal mint floral pink
+frosted dark yellow khaki green
+burnished aquamarine slate medium forest
+black sandy medium saddle midnight
+rose hot burnished deep sienna
+black frosted hot navy chocolate
+mint white dim burnished goldenrod
+pink tomato ivory misty honeydew
+cornflower olive deep burnished dark
+
+P_NAME                                                 
+-------------------------------------------------------
+papaya linen slate navy yellow
+goldenrod orange beige navy brown
+almond drab lavender bisque purple
+slate magenta wheat lemon brown
+white magenta linen spring royal
+turquoise navajo cornsilk dark lemon
+purple blanched floral pink dim
+metallic snow hot lime chocolate
+tomato spring black pink maroon
+almond lawn magenta hot olive
+burlywood light hot white blush
+
+P_NAME                                                 
+-------------------------------------------------------
+chocolate royal blanched cyan peru
+burnished blanched firebrick royal red
+light azure lace sky khaki
+dark moccasin ivory dim beige
+brown hot almond seashell navajo
+linen cyan bisque wheat coral
+lavender orange wheat green maroon
+dim frosted honeydew royal cornflower
+papaya drab medium burnished cyan
+spring mint pink cornsilk brown
+bisque ghost mint pale grey
+
+P_NAME                                                 
+-------------------------------------------------------
+rosy cream antique indian sienna
+blue pink medium firebrick metallic
+blue lemon linen khaki cornsilk
+indian dodger chartreuse goldenrod blush
+gainsboro pink midnight antique cream
+deep red lavender spring drab
+sandy purple cornflower firebrick aquamarine
+dim puff cornflower mint blush
+goldenrod burnished lemon rose violet
+grey antique frosted salmon turquoise
+olive tan blanched chiffon rosy
+
+P_NAME                                                 
+-------------------------------------------------------
+ivory purple rosy thistle slate
+cornflower red moccasin sky grey
+maroon cream grey beige cornsilk
+frosted plum peach drab cream
+almond wheat bisque ghost chiffon
+steel aquamarine beige pink frosted
+ghost gainsboro dark tan brown
+hot sandy navy deep slate
+plum peach indian azure orange
+salmon royal spring pink navajo
+peach honeydew medium firebrick sienna
+
+P_NAME                                                 
+-------------------------------------------------------
+spring cornsilk rose coral lawn
+gainsboro light cream cyan royal
+brown navajo dark moccasin burlywood
+blue burnished powder rosy floral
+salmon red moccasin blush black
+pink turquoise floral cyan violet
+papaya lemon honeydew powder orchid
+peru aquamarine blue yellow chiffon
+chiffon brown mint burlywood white
+maroon pale white cyan dodger
+firebrick gainsboro grey sienna drab
+
+P_NAME                                                 
+-------------------------------------------------------
+brown sky chartreuse antique saddle
+goldenrod frosted lawn floral pink
+blue honeydew azure medium frosted
+purple chartreuse lemon maroon turquoise
+navajo black seashell yellow hot
+cream goldenrod powder drab lace
+lemon spring lime burnished powder
+navajo midnight green orange linen
+lawn ghost deep moccasin spring
+cornsilk dim tomato lemon beige
+floral linen cream chartreuse dim
+
+P_NAME                                                 
+-------------------------------------------------------
+burlywood red khaki ivory blue
+ivory lime deep moccasin peach
+steel dark cornflower plum pink
+black yellow slate antique rosy
+chiffon spring grey pink rose
+lace ivory floral chocolate olive
+beige papaya navy chocolate blanched
+drab lawn honeydew misty frosted
+salmon cream khaki plum floral
+medium spring brown ghost floral
+dark light magenta cornflower khaki
+
+P_NAME                                                 
+-------------------------------------------------------
+pink dark lemon khaki metallic
+yellow cream dodger white metallic
+lace blanched ivory wheat lavender
+steel azure lawn blanched lime
+plum sandy violet seashell powder
+olive powder bisque gainsboro burlywood
+almond brown powder cornflower cyan
+goldenrod snow beige almond bisque
+hot chocolate olive gainsboro salmon
+cornsilk blush almond hot brown
+sienna lime navajo beige white
+
+P_NAME                                                 
+-------------------------------------------------------
+aquamarine tomato peru chocolate dark
+grey blush firebrick cyan forest
+lavender dark coral cornsilk sky
+almond navajo orchid spring chartreuse
+salmon sky papaya lawn coral
+beige drab navajo deep forest
+violet medium bisque floral chocolate
+puff honeydew cyan moccasin pale
+snow purple peach tomato medium
+violet seashell azure frosted tan
+blush dim pale chartreuse black
+
+P_NAME                                                 
+-------------------------------------------------------
+moccasin mint puff beige steel
+olive cornsilk brown moccasin bisque
+dark orchid black tomato green
+misty maroon dim bisque gainsboro
+lime slate thistle beige blanched
+grey navajo cyan blue yellow
+seashell purple black chartreuse lemon
+blush bisque lace papaya rose
+pink beige snow lavender steel
+beige violet gainsboro moccasin aquamarine
+green maroon royal cyan pale
+
+P_NAME                                                 
+-------------------------------------------------------
+bisque sky tomato midnight chiffon
+black frosted honeydew cornflower lime
+blanched almond lawn coral linen
+spring goldenrod thistle white sandy
+frosted honeydew red turquoise spring
+tan mint cyan forest drab
+firebrick red brown antique magenta
+dodger dim chiffon burlywood floral
+mint goldenrod hot violet orchid
+coral drab lawn peru smoke
+blush chocolate orange seashell wheat
+
+P_NAME                                                 
+-------------------------------------------------------
+lavender lawn cornflower firebrick cream
+sky chocolate papaya chiffon grey
+cream salmon black hot snow
+violet midnight ivory misty medium
+beige orchid chocolate ghost drab
+maroon papaya olive blush forest
+burnished bisque indian ivory hot
+floral yellow peach sandy lime
+frosted bisque lime peru powder
+azure blue lemon violet maroon
+cornflower brown papaya goldenrod cornsilk
+
+P_NAME                                                 
+-------------------------------------------------------
+burnished olive lawn cyan cornsilk
+burnished navajo blue cyan lawn
+plum bisque lawn smoke medium
+salmon dim indian powder azure
+dim almond smoke azure blue
+floral chartreuse blue tomato purple
+red chiffon moccasin lawn forest
+deep yellow rose dim midnight
+medium peach lawn cream grey
+green chocolate black blush royal
+purple indian thistle chocolate tan
+
+P_NAME                                                 
+-------------------------------------------------------
+medium navy black turquoise cream
+slate orange puff plum coral
+burnished coral cornflower drab blue
+lime chocolate lawn black sandy
+forest plum firebrick papaya indian
+antique salmon navy cornsilk lime
+light firebrick salmon red dark
+cornflower cream blue deep metallic
+pink lawn midnight forest lavender
+peach gainsboro forest brown lawn
+deep red peru blue lawn
+
+P_NAME                                                 
+-------------------------------------------------------
+black purple burnished violet midnight
+lime medium chartreuse white burlywood
+dodger forest maroon salmon tomato
+tan sienna black almond grey
+metallic ivory orchid indian green
+floral coral royal chocolate plum
+royal misty drab olive goldenrod
+chocolate linen goldenrod lavender wheat
+puff turquoise ivory chiffon khaki
+rose blanched indian tomato hot
+floral beige black dim antique
+
+P_NAME                                                 
+-------------------------------------------------------
+forest papaya midnight chartreuse tan
+lime blue blush rose blanched
+indian sky dark olive green
+azure cornflower beige green honeydew
+forest hot burnished wheat linen
+cream lemon pink grey beige
+antique blue black peach seashell
+lavender misty brown peach beige
+peru slate red blush grey
+dark light sky cyan dim
+burlywood wheat ivory misty sandy
+
+P_NAME                                                 
+-------------------------------------------------------
+green brown linen honeydew lavender
+floral chocolate spring midnight forest
+cream ghost dark slate lavender
+lavender black blanched cornflower goldenrod
+burlywood forest ghost antique deep
+snow salmon misty saddle sandy
+gainsboro dim dark lavender ivory
+magenta beige coral cornflower floral
+grey sandy bisque violet brown
+slate burlywood firebrick metallic yellow
+burnished floral magenta blanched saddle
+
+P_NAME                                                 
+-------------------------------------------------------
+metallic lemon bisque misty lace
+lawn linen olive antique pink
+green lawn firebrick lemon peach
+dim chartreuse tan cornsilk burnished
+azure smoke puff beige lawn
+powder lime puff chocolate lawn
+steel misty dark black cyan
+ghost grey midnight antique lime
+green pale chocolate steel dodger
+blush pale chiffon grey wheat
+chartreuse blanched magenta khaki lawn
+
+P_NAME                                                 
+-------------------------------------------------------
+ivory beige powder honeydew green
+dim powder cyan papaya drab
+cornflower brown spring turquoise grey
+antique khaki lawn chocolate chartreuse
+tomato powder khaki dodger cyan
+beige coral lavender deep lemon
+sky burnished azure steel papaya
+khaki misty powder lawn dim
+dodger red gainsboro thistle rose
+frosted ghost ivory red deep
+
+329 rows selected. 
+
+Elapsed: 00:00:00.479
+SQL> 
+SQL> select distinct part_new.p_name from supplier_new join partsupp_new on partsupp_new.ps_suppkey=supplier_new.s_suppkey join part_new on part_new.p_partkey=partsupp_new.ps_partkey and supplier_new.s_address='F2YYbRT2EV';
+
+0 rows selected. 
+
+Elapsed: 00:00:00.042
+SQL> 
+SQL> select s_name from supplier_new,nation_new where supplier_new.s_nationkey=nation_new.n_nationkey and n_name='INDIA';
+
+S_NAME                   
+-------------------------
+Supplier#000000012       
+Supplier#000000015       
+Supplier#000000039       
+Supplier#000000282       
+Supplier#000000303       
+Supplier#000000308       
+Supplier#000000325       
+Supplier#000000346       
+Supplier#000000347       
+Supplier#000000348       
+Supplier#000002139       
+
+S_NAME                   
+-------------------------
+Supplier#000002156       
+Supplier#000002210       
+Supplier#000000421       
+Supplier#000000435       
+Supplier#000002790       
+Supplier#000002795       
+Supplier#000000060       
+Supplier#000000061       
+Supplier#000000102       
+Supplier#000000124       
+Supplier#000000136       
+
+S_NAME                   
+-------------------------
+Supplier#000000235       
+Supplier#000000238       
+Supplier#000000241       
+Supplier#000000245       
+Supplier#000000757       
+Supplier#000000759       
+Supplier#000000601       
+Supplier#000000611       
+Supplier#000000638       
+Supplier#000000668       
+Supplier#000000671       
+
+S_NAME                   
+-------------------------
+Supplier#000000693       
+Supplier#000000853       
+Supplier#000000871       
+Supplier#000000878       
+Supplier#000000891       
+Supplier#000000892       
+Supplier#000000901       
+Supplier#000000912       
+Supplier#000001177       
+Supplier#000001241       
+Supplier#000001278       
+
+S_NAME                   
+-------------------------
+Supplier#000001289       
+Supplier#000001308       
+Supplier#000001320       
+Supplier#000001328       
+Supplier#000001340       
+Supplier#000001352       
+Supplier#000000931       
+Supplier#000000958       
+Supplier#000001015       
+Supplier#000001031       
+Supplier#000001037       
+
+S_NAME                   
+-------------------------
+Supplier#000001040       
+Supplier#000000786       
+Supplier#000000795       
+Supplier#000000805       
+Supplier#000000446       
+Supplier#000000457       
+Supplier#000000517       
+Supplier#000000522       
+Supplier#000000547       
+Supplier#000000551       
+Supplier#000001414       
+
+S_NAME                   
+-------------------------
+Supplier#000001437       
+Supplier#000001453       
+Supplier#000001460       
+Supplier#000002889       
+Supplier#000002894       
+Supplier#000002945       
+Supplier#000001464       
+Supplier#000001483       
+Supplier#000001507       
+Supplier#000001514       
+Supplier#000001516       
+
+S_NAME                   
+-------------------------
+Supplier#000001530       
+Supplier#000001556       
+Supplier#000001598       
+Supplier#000001613       
+Supplier#000001694       
+Supplier#000001754       
+Supplier#000001777       
+Supplier#000002863       
+Supplier#000001377       
+Supplier#000001395       
+Supplier#000001403       
+
+S_NAME                   
+-------------------------
+Supplier#000001406       
+Supplier#000001988       
+Supplier#000002041       
+Supplier#000002119       
+Supplier#000002121       
+Supplier#000002127       
+Supplier#000002129       
+Supplier#000002246       
+Supplier#000002254       
+Supplier#000002296       
+Supplier#000002339       
+
+S_NAME                   
+-------------------------
+Supplier#000002340       
+Supplier#000002342       
+Supplier#000002348       
+Supplier#000002355       
+Supplier#000002372       
+Supplier#000002387       
+Supplier#000002421       
+Supplier#000002431       
+Supplier#000002466       
+Supplier#000002478       
+Supplier#000002479       
+
+S_NAME                   
+-------------------------
+Supplier#000002532       
+Supplier#000002563       
+Supplier#000002568       
+Supplier#000002569       
+Supplier#000002600       
+Supplier#000002624       
+Supplier#000002639       
+Supplier#000002695       
+Supplier#000002726       
+Supplier#000002727       
+Supplier#000002747       
+
+S_NAME                   
+-------------------------
+Supplier#000001799       
+Supplier#000001803       
+Supplier#000001877       
+Supplier#000001894       
+Supplier#000001905       
+Supplier#000001906       
+
+127 rows selected. 
+
+Elapsed: 00:00:00.012
+SQL> 
+SQL> set timing off
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> drop tablespace drive_c including contents and datafiles;
+
+Tablespace DRIVE_C dropped.
+
+SQL> drop tablespace drive_d including contents and datafiles;
+
+Tablespace DRIVE_D dropped.
+
+SQL> spool off

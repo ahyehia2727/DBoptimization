@@ -1,0 +1,431 @@
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> create tablespace tsp
+  2  extent management local autoallocate
+  3  segment space management auto
+  4  datafile 'tsp.dbf' size 400m;
+
+Tablespace TSP created.
+
+SQL> 
+SQL> ALTER USER CSCI317 QUOTA 500M ON tsp;
+
+User CSCI317 altered.
+
+SQL> 
+SQL> connect csci317/csci317
+Connected.
+SQL> 
+SQL> CREATE TABLE LINEITEM_1997(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEM_PKEY1 PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19  	CONSTRAINT LINEITEM_FKEY11 FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEM_FKEY21 FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEM_FKEY31 FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP(PS_PARTKEY, PS_SUPPKEY),
+ 25  	CONSTRAINT LINEITEM_FKEY41 FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEM_CHECK11 CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEM_CHECK21 CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEM_CHECK31 CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEM_CHECK41 CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      tablespace tsp;
+
+Table LINEITEM_1997 created.
+
+SQL> 
+SQL> CREATE TABLE LINEITEM_1998(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEM_PKEY2 PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19  	CONSTRAINT LINEITEM_FKEY12 FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEM_FKEY22 FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEM_FKEY32 FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP(PS_PARTKEY, PS_SUPPKEY),
+ 25  	CONSTRAINT LINEITEM_FKEY42 FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEM_CHECK12 CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEM_CHECK22 CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEM_CHECK32 CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEM_CHECK42 CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      tablespace tsp;
+
+Table LINEITEM_1998 created.
+
+SQL> 
+SQL> CREATE TABLE LINEITEM_OTHERS(
+  2  L_ORDERKEY 	NUMBER(12)	NOT NULL,
+  3  L_PARTKEY	NUMBER(12)	NOT NULL,
+  4  L_SUPPKEY	NUMBER(12)	NOT NULL,
+  5  L_LINENUMBER	NUMBER(12)	NOT NULL,
+  6  L_QUANTITY	NUMBER(12,2)	NOT NULL,
+  7  L_EXTENDEDPRICE NUMBER(12,2)	NOT NULL,
+  8  L_DISCOUNT	NUMBER(12,2)	NOT NULL,
+  9  L_TAX		NUMBER(12,2)	NOT NULL,
+ 10  L_RETURNFLAG	CHAR(1)		NOT NULL,
+ 11  L_LINESTATUS	CHAR(1)		NOT NULL,
+ 12  L_SHIPDATE	DATE		NOT NULL,
+ 13  L_COMMITDATE	DATE		NOT NULL,
+ 14  L_RECEIPTDATE	DATE		NOT NULL,
+ 15  L_SHIPINSTRUCT	CHAR(25)	NOT NULL,
+ 16  L_SHIPMODE	CHAR(10)	NOT NULL,
+ 17  L_COMMENT	VARCHAR(44)	NOT NULL,
+ 18  	CONSTRAINT LINEITEM_PKEYO PRIMARY KEY (L_ORDERKEY, L_LINENUMBER),
+ 19  	CONSTRAINT LINEITEM_FKEY1O FOREIGN kEY (L_ORDERKEY)
+ 20  		REFERENCES ORDERSS(O_ORDERKEY),
+ 21  	CONSTRAINT LINEITEM_FKEY2O FOREIGN KEY (L_PARTKEY)
+ 22  		REFERENCES PART(P_PARTKEY),
+ 23  	CONSTRAINT LINEITEM_FKEY3O FOREIGN KEY (L_PARTKEY,L_SUPPKEY)
+ 24  		REFERENCES PARTSUPP(PS_PARTKEY, PS_SUPPKEY),
+ 25  	CONSTRAINT LINEITEM_FKEY4O FOREIGN kEY (L_SUPPKEY)
+ 26  		REFERENCES SUPPLIER(S_SUPPKEY),
+ 27  	CONSTRAINT LINEITEM_CHECK1O CHECK (L_QUANTITY >= 0),
+ 28  	CONSTRAINT LINEITEM_CHECK2O CHECK (L_EXTENDEDPRICE >= 0),
+ 29  	CONSTRAINT LINEITEM_CHECK3O CHECK (L_TAX >= 0),
+ 30  	CONSTRAINT LINEITEM_CHECK4O CHECK (L_DISCOUNT BETWEEN 0.00 AND 1.00) )
+ 31      tablespace tsp;
+
+Table LINEITEM_OTHERS created.
+
+SQL> 
+SQL> insert into lineitem_1997
+  2  SELECT *
+  3  FROM lineitem
+  4  WHERE l_orderkey IN (SELECT o_orderkey FROM orderss WHERE EXTRACT(year FROM o_orderdate) = 1997);
+
+270,626 rows inserted.
+
+SQL> 
+SQL> insert into lineitem_1998
+  2  SELECT *
+  3  FROM lineitem
+  4  WHERE l_orderkey IN (SELECT o_orderkey FROM orderss WHERE EXTRACT(year FROM o_orderdate) = 1998);
+
+162,189 rows inserted.
+
+SQL> 
+SQL> insert into lineitem_Others
+  2  SELECT *
+  3  FROM lineitem
+  4  WHERE l_orderkey not IN (SELECT o_orderkey FROM orderss WHERE EXTRACT(year FROM o_orderdate) = 1997 or EXTRACT(year FROM o_orderdate) = 1998);
+
+1,367,278 rows inserted.
+
+SQL> set autotrace traceonly statistics on;
+Autotrace TraceOnly
+ Exhibits the performance statistics with silent query output
+SP2-0158: unknown SET option "on"
+SQL> 
+SQL> select sum(l.l_quantity) from lineitem l join orderss o on l.l_orderkey=o.o_orderkey and EXTRACT(year FROM o.o_orderdate) = 1997;
+
+1 row selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  9awuxxcyq104r, child number 0
+-------------------------------------
+select sum(l.l_quantity) from lineitem l join orderss o on 
+l.l_orderkey=o.o_orderkey and EXTRACT(year FROM o.o_orderdate) = 1997
+ 
+Plan hash value: 49750311
+ 
+--------------------------------------------------------------------------------------
+| Id  | Operation           | Name     | E-Rows |  OMem |  1Mem | Used-Mem | Used-Tmp|
+--------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT    |          |        |       |       |          |         |
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   1 |  SORT AGGREGATE     |          |      1 |       |       |          |         |
+|*  2 |   HASH JOIN         |          |  17762 |  4843K|  2769K| 1066K (1)|      10M|
+|*  3 |    TABLE ACCESS FULL| ORDERSS  |   4500 |       |       |          |         |
+|   4 |    TABLE ACCESS FULL| LINEITEM |   1800K|       |       |          |         |
+--------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("L"."L_ORDERKEY"="O"."O_ORDERKEY")
+   3 - filter(EXTRACT(YEAR FROM INTERNAL_FUNCTION("O"."O_ORDERDATE"))=1997)
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+Note
+-----
+   - this is an adaptive plan
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+              44  CPU used by this session
+              44  CPU used when call started
+             111  DB time
+               5  Requests to/from client
+       343007232  cell physical IO interconnect bytes
+           40278  consistent gets
+           39519  consistent gets direct
+             727  consistent gets examination
+             727  consistent gets examination (fastpath)
+             759  consistent gets from cache
+              32  consistent gets pin
+              32  consistent gets pin (fastpath)
+              11  enqueue releases
+              11  enqueue requests
+            1598  non-idle wait count
+              73  non-idle wait time
+               3  opened cursors cumulative
+               1  opened cursors current
+            1414  physical read total IO requests
+       333373440  physical read total bytes
+            1246  physical read total multi block requests
+             168  physical write total IO requests
+         9633792  physical write total bytes
+               1  pinned cursors current
+               1  process last non-idle time
+              18  recursive calls
+           40278  session logical reads
+              73  user I/O wait time
+               6  user calls
+SQL> select sum(l.l_quantity*l.l_tax) as "total tax in 1998" from lineitem l join orderss o on l.l_orderkey=o.o_orderkey and EXTRACT(year FROM o.o_orderdate) = 1998;
+
+1 row selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  5u4aa9qdk9c8r, child number 0
+-------------------------------------
+select sum(l.l_quantity*l.l_tax) as "total tax in 1998" from lineitem l 
+join orderss o on l.l_orderkey=o.o_orderkey and EXTRACT(year FROM 
+o.o_orderdate) = 1998
+ 
+Plan hash value: 49750311
+ 
+--------------------------------------------------------------------------------------
+| Id  | Operation           | Name     | E-Rows |  OMem |  1Mem | Used-Mem | Used-Tmp|
+--------------------------------------------------------------------------------------
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT    |          |        |       |       |          |         |
+|   1 |  SORT AGGREGATE     |          |      1 |       |       |          |         |
+|*  2 |   HASH JOIN         |          |  17762 |  3521K|  2561K| 1040K (1)|    8192K|
+|*  3 |    TABLE ACCESS FULL| ORDERSS  |   4500 |       |       |          |         |
+|   4 |    TABLE ACCESS FULL| LINEITEM |   1800K|       |       |          |         |
+--------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("L"."L_ORDERKEY"="O"."O_ORDERKEY")
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   3 - filter(EXTRACT(YEAR FROM INTERNAL_FUNCTION("O"."O_ORDERDATE"))=1998)
+ 
+Note
+-----
+   - this is an adaptive plan
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+              35  CPU used by this session
+              35  CPU used when call started
+              82  DB time
+               5  Requests to/from client
+       338305024  cell physical IO interconnect bytes
+           40280  consistent gets
+           39519  consistent gets direct
+             727  consistent gets examination
+             727  consistent gets examination (fastpath)
+             761  consistent gets from cache
+              34  consistent gets pin
+              34  consistent gets pin (fastpath)
+               9  enqueue releases
+               9  enqueue requests
+            1516  non-idle wait count
+              49  non-idle wait time
+               4  opened cursors cumulative
+               1  opened cursors current
+            1373  physical read total IO requests
+       331022336  physical read total bytes
+            1246  physical read total multi block requests
+             127  physical write total IO requests
+         7282688  physical write total bytes
+               1  pinned cursors current
+               1  process last non-idle time
+              23  recursive calls
+           40280  session logical reads
+              49  user I/O wait time
+               6  user calls
+SQL> 
+SQL> select sum(l_quantity) from lineitem_1997;
+
+1 row selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  casfmnsvyugq9, child number 0
+-------------------------------------
+select sum(l_quantity) from lineitem_1997
+ 
+Plan hash value: 1675679979
+ 
+-----------------------------------------------------
+| Id  | Operation          | Name          | E-Rows |
+-----------------------------------------------------
+|   0 | SELECT STATEMENT   |               |        |
+|   1 |  SORT AGGREGATE    |               |      1 |
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   2 |   TABLE ACCESS FULL| LINEITEM_1997 |    277K|
+-----------------------------------------------------
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+               5  CPU used by this session
+               5  CPU used when call started
+              17  DB time
+               6  Requests to/from client
+               4  application wait time
+               4  enqueue conversions
+               7  enqueue releases
+               7  enqueue requests
+               1  enqueue waits
+               2  messages sent
+             237  non-idle wait count
+              11  non-idle wait time
+               6  opened cursors cumulative
+               1  opened cursors current
+             302  physical read total IO requests
+        42352640  physical read total bytes
+             152  physical read total multi block requests
+               1  pinned cursors current
+              15  recursive calls
+               1  recursive cpu usage
+            5076  session logical reads
+               7  user I/O wait time
+               6  user calls
+SQL> select sum(l_quantity*l_tax) as "total tax in 1998" from lineitem_1998;
+
+1 row selected. 
+
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  cz628mc6a25uk, child number 0
+-------------------------------------
+select sum(l_quantity*l_tax) as "total tax in 1998" from lineitem_1998
+ 
+Plan hash value: 3388792340
+ 
+-----------------------------------------------------
+| Id  | Operation          | Name          | E-Rows |
+-----------------------------------------------------
+|   0 | SELECT STATEMENT   |               |        |
+|   1 |  SORT AGGREGATE    |               |      1 |
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   2 |   TABLE ACCESS FULL| LINEITEM_1998 |    162K|
+-----------------------------------------------------
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+   - Warning: basic plan statistics not available. These are only collected when:
+       * hint 'gather_plan_statistics' is used for the statement or
+       * parameter 'statistics_level' is set to 'ALL', at session or system level
+ 
+
+Statistics
+-----------------------------------------------------------
+               4  CPU used by this session
+               4  CPU used when call started
+              14  DB time
+               4  Requests to/from client
+               7  application wait time
+               4  enqueue conversions
+              11  enqueue releases
+              11  enqueue requests
+               1  enqueue waits
+               1  messages sent
+             164  non-idle wait count
+              10  non-idle wait time
+              10  opened cursors cumulative
+               1  opened cursors current
+             201  physical read total IO requests
+        26238976  physical read total bytes
+              90  physical read total multi block requests
+               1  pinned cursors current
+              13  recursive calls
+            3103  session logical reads
+               3  user I/O wait time
+               4  user calls
+SQL> 
+SQL> set autotrace off
+Autotrace Disabled
+SQL> 
+SQL> connect system/oracle
+Connected.
+SQL> 
+SQL> drop tablespace tsp including contents and datafiles;
+
+Tablespace TSP dropped.
+
+SQL> 
+SQL> set echo off
